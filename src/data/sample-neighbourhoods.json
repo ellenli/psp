@@ -1,0 +1,413 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "Downtown Yonge East",
+        "AREA_SHORT_CODE": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.39,
+              43.648
+            ],
+            [
+              -79.366,
+              43.648
+            ],
+            [
+              -79.366,
+              43.666
+            ],
+            [
+              -79.39,
+              43.666
+            ],
+            [
+              -79.39,
+              43.648
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "The Beaches",
+        "AREA_SHORT_CODE": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.318,
+              43.661
+            ],
+            [
+              -79.282,
+              43.661
+            ],
+            [
+              -79.282,
+              43.681
+            ],
+            [
+              -79.318,
+              43.681
+            ],
+            [
+              -79.318,
+              43.661
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "High Park",
+        "AREA_SHORT_CODE": 3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.482,
+              43.634
+            ],
+            [
+              -79.45,
+              43.634
+            ],
+            [
+              -79.45,
+              43.658
+            ],
+            [
+              -79.482,
+              43.658
+            ],
+            [
+              -79.482,
+              43.634
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "Scarborough Village",
+        "AREA_SHORT_CODE": 4
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.235,
+              43.723
+            ],
+            [
+              -79.195,
+              43.723
+            ],
+            [
+              -79.195,
+              43.751
+            ],
+            [
+              -79.235,
+              43.751
+            ],
+            [
+              -79.235,
+              43.723
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "Etobicoke Lakeshore",
+        "AREA_SHORT_CODE": 5
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.534,
+              43.608
+            ],
+            [
+              -79.486,
+              43.608
+            ],
+            [
+              -79.486,
+              43.632
+            ],
+            [
+              -79.534,
+              43.632
+            ],
+            [
+              -79.534,
+              43.608
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "North York Centre",
+        "AREA_SHORT_CODE": 6
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.429,
+              43.754
+            ],
+            [
+              -79.393,
+              43.754
+            ],
+            [
+              -79.393,
+              43.782
+            ],
+            [
+              -79.429,
+              43.782
+            ],
+            [
+              -79.429,
+              43.754
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "Riverdale",
+        "AREA_SHORT_CODE": 7
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.366,
+              43.657
+            ],
+            [
+              -79.338,
+              43.657
+            ],
+            [
+              -79.338,
+              43.679
+            ],
+            [
+              -79.366,
+              43.679
+            ],
+            [
+              -79.366,
+              43.657
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "Leslieville",
+        "AREA_SHORT_CODE": 8
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.348,
+              43.653
+            ],
+            [
+              -79.322,
+              43.653
+            ],
+            [
+              -79.322,
+              43.671
+            ],
+            [
+              -79.348,
+              43.671
+            ],
+            [
+              -79.348,
+              43.653
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "Annex",
+        "AREA_SHORT_CODE": 9
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.417,
+              43.66
+            ],
+            [
+              -79.391,
+              43.66
+            ],
+            [
+              -79.391,
+              43.68
+            ],
+            [
+              -79.417,
+              43.68
+            ],
+            [
+              -79.417,
+              43.66
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "Liberty Village",
+        "AREA_SHORT_CODE": 10
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.431,
+              43.63
+            ],
+            [
+              -79.409,
+              43.63
+            ],
+            [
+              -79.409,
+              43.646
+            ],
+            [
+              -79.431,
+              43.646
+            ],
+            [
+              -79.431,
+              43.63
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "Don Mills",
+        "AREA_SHORT_CODE": 11
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.365,
+              43.718
+            ],
+            [
+              -79.325,
+              43.718
+            ],
+            [
+              -79.325,
+              43.748
+            ],
+            [
+              -79.365,
+              43.748
+            ],
+            [
+              -79.365,
+              43.718
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "AREA_NAME": "Mimico",
+        "AREA_SHORT_CODE": 12
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.509,
+              43.606
+            ],
+            [
+              -79.481,
+              43.606
+            ],
+            [
+              -79.481,
+              43.626
+            ],
+            [
+              -79.509,
+              43.626
+            ],
+            [
+              -79.509,
+              43.606
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
