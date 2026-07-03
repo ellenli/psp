@@ -9,8 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@img/sharp-darwin-arm64": "^0.35.2",
-    "@next/swc-darwin-arm64": "^16.2.9",
     "@radix-ui/react-accordion": "^1.2.14",
     "@radix-ui/react-checkbox": "^1.3.5",
     "@radix-ui/react-collapsible": "^1.1.14",
@@ -20,13 +18,11 @@
     "@radix-ui/react-select": "^2.3.1",
     "@radix-ui/react-slot": "^1.3.0",
     "@radix-ui/react-toggle-group": "^1.1.13",
-    "@tailwindcss/oxide-darwin-arm64": "^4.3.2",
     "@types/leaflet": "^1.9.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "leaflet": "^1.9.4",
-    "lightningcss-darwin-arm64": "^1.32.0",
     "lucide-react": "^1.22.0",
     "next": "16.2.9",
     "react": "19.2.4",
