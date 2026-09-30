@@ -27,8 +27,47 @@ import {
 import { MetricTree } from "@/components/metric-tree";
 import { PlacesTwoSections } from "@/components/places/PlacesTwoSections";
 import { AreaDetailPanel } from "@/components/detail-sheet";
-import type { MapFeatureDatum } from "@/components/score-map";
+import type { BaseMap, MapFeatureDatum } from "@/components/score-map";
 import type { SchoolZonesVisibility } from "@/components/school-zones-layer";
+import { ZONE_NEIGHBOURHOODS } from "@/lib/schoolZones";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Info } from "lucide-react";
+
+const OUTSIDE_ZONES = "Outside the top school zones";
+
+const ZONES_HELP =
+  "Nine ranked neighbourhoods drawn with TDSB attendance boundaries; dotted outlines are shared zones with a choice of high school. Hover a zone for its drive to MDA and 2021 Census demographics. Neighbourhoods outside every zone are left uncoloured and out of the score deciles. TDSB lines are approximate, so confirm an address with TDSB's Find Your School tool.";
+
+/** Info icon that shows `children` on hover or keyboard focus. */
+function InfoTip({ label, children }: { label: string; children: React.ReactNode }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        aria-label={label}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        className="inline-flex text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-full"
+      >
+        <Info className="h-3.5 w-3.5" />
+      </PopoverTrigger>
+      <PopoverContent
+        side="right"
+        align="start"
+        className="z-[1100] w-72 p-3 text-[11px] leading-relaxed text-muted-foreground"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        {children}
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 import {
   CENSUS_CHARACTERISTICS,
@@ -197,6 +236,7 @@ export function Explore() {
     elem: true,
     pins: true,
   });
+  const [baseMap, setBaseMap] = React.useState<BaseMap>("simple");
 
   // Geocode commute targets that have a cutoff, storing resolved coords by row
   // id. Network failures are swallowed (geocode returns null); unresolved rows
@@ -262,11 +302,23 @@ export function Explore() {
     [commutes, nearby],
   );
 
+  // With school zones on, neighbourhoods that don't overlap any catchment are
+  // ignored: left out of the decile ranking and drawn outline-only.
+  const inZone = React.useMemo(
+    () =>
+      filtered.map(
+        (f) => !showZones || f.properties.AREA_NAME in ZONE_NEIGHBOURHOODS,
+      ),
+    [filtered, showZones],
+  );
+
   // Composite raw value per filtered feature — metrics only (commutes never
   // affect map coloring; they are informational in the detail sheet).
   const rawScores = React.useMemo(() => {
-    return filtered.map((f) => compositeScore(f, selectedLeaves));
-  }, [filtered, selectedLeaves]);
+    return filtered.map((f, i) =>
+      inZone[i] ? compositeScore(f, selectedLeaves) : null,
+    );
+  }, [filtered, selectedLeaves, inZone]);
 
   const scoreDeciles = React.useMemo(
     () => ntile(rawScores, 10),
@@ -276,11 +328,11 @@ export function Explore() {
   // Census values + deciles for the bottom map.
   const censusValues = React.useMemo(
     () =>
-      filtered.map((f) => {
+      filtered.map((f, i) => {
         const c = f.properties.census;
-        return c ? (c[census] as number) : null;
+        return c && inZone[i] ? (c[census] as number) : null;
       }),
-    [filtered, census],
+    [filtered, census, inZone],
   );
   const censusDeciles = React.useMemo(
     () => ntile(censusValues, 10),
@@ -332,6 +384,9 @@ export function Explore() {
     const pass = commutePass[i] && fraserPass[i];
     const d = pass ? scoreDeciles[i] : null;
     const raw = pass ? rawScores[i] : null;
+    if (!inZone[i]) {
+      return { decile: null, color: NA_COLOR, hidden: true, valueLabel: OUTSIDE_ZONES };
+    }
     return {
       decile: d,
       color: scoreColor(d),
@@ -343,6 +398,9 @@ export function Explore() {
   const censusData: MapFeatureDatum[] = filtered.map((f, i) => {
     const d = censusDeciles[i];
     const v = censusValues[i];
+    if (!inZone[i]) {
+      return { decile: null, color: NA_COLOR, hidden: true, valueLabel: OUTSIDE_ZONES };
+    }
     return {
       decile: d,
       color: censusColor(d),
@@ -406,8 +464,7 @@ export function Explore() {
       <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-background/50 p-6 backdrop-blur-md md:hidden">
         <div className="max-w-sm rounded-xl border bg-card p-6 text-card-foreground shadow-lg">
           <p className="text-base font-semibold">
-            PlayScore<span className="text-muted-foreground"> Plus</span> is a
-            desktop tool
+            Neighbourhood Search is a desktop tool
           </p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             This interactive map tool relies on side-by-side panels designed
@@ -424,11 +481,11 @@ export function Explore() {
           {/* App title (moved from the removed top bar) */}
           <div className="flex items-center gap-2">
             <span className="text-lg font-semibold leading-none tracking-tight">
-              PlayScore<span className="text-muted-foreground"> Plus</span>
+              Neighbourhood Search
             </span>
             <span className="text-muted-foreground/40">|</span>
             <span className="text-xs text-muted-foreground">
-              Greater Toronto Area
+              For Ellen &amp; Zach
             </span>
           </div>
 
@@ -526,6 +583,7 @@ export function Explore() {
               <Label htmlFor="show-zones" className="text-xs leading-tight">
                 Show top school zones
               </Label>
+              <InfoTip label="About school zones">{ZONES_HELP}</InfoTip>
             </div>
             {showZones && (
               <div className="space-y-2 pl-6">
@@ -557,15 +615,21 @@ export function Explore() {
                     </Label>
                   </div>
                 ))}
-                <p className="text-[11px] leading-relaxed text-muted-foreground">
-                  Nine ranked neighbourhoods drawn with TDSB attendance
-                  boundaries; dotted outlines are shared zones with a choice of
-                  high school. Hover a zone for its drive to MDA and 2021
-                  Census demographics. TDSB lines are approximate, so confirm
-                  an address with TDSB&apos;s Find Your School tool.
-                </p>
               </div>
             )}
+          </div>
+
+          {/* Control 6 */}
+          <div className="flex items-start gap-2">
+            <Checkbox
+              id="detailed-basemap"
+              checked={baseMap === "detailed"}
+              onCheckedChange={(v) => setBaseMap(v === true ? "detailed" : "simple")}
+              className="mt-0.5"
+            />
+            <Label htmlFor="detailed-basemap" className="text-xs leading-tight">
+              Detailed base map
+            </Label>
           </div>
             </CardContent>
           </Card>
@@ -595,6 +659,7 @@ export function Explore() {
             highlightContext={detailBounds}
             scored={scored}
             schoolZones={showZones ? zoneLayers : null}
+            baseMap={baseMap}
           />
         </div>
         {showCensus && (
@@ -611,6 +676,7 @@ export function Explore() {
               bounds={bounds}
               onFeatureClick={(i) => setDetailIndex(i)}
               hideLegend={detailIndex !== null}
+              baseMap={baseMap}
             />
           </div>
         )}
@@ -633,7 +699,7 @@ export function Explore() {
             />
           </div>
           <p className="mt-4 text-left text-[11px] leading-relaxed text-muted-foreground/70">
-            PlayScore Plus is based on{" "}
+            Neighbourhood Search is based on{" "}
             <a
               href="https://playscore-ca-2-6.shinyapps.io/shiny/"
               target="_blank"

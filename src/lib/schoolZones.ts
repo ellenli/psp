@@ -154,3 +154,63 @@ export function zoneStats(z: SchoolZone): [string, string][] {
     ["Race", `${d.vm}% visible minority (${d.top.map(([g, p]) => `${g} ${p}%`).join(", ")}) · ${100 - d.vm}% not a visible minority`],
   ];
 }
+
+/**
+ * City of Toronto neighbourhoods that overlap the school-zone catchments above,
+ * with the % of each neighbourhood's area inside a catchment. Computed offline
+ * (shapely) against the drawn polygons; overlaps under 1% or 2 ha are dropped
+ * as boundary slivers where TDSB and City lines trace the same street slightly
+ * differently. Neighbourhoods not listed are left unscored when zones are on.
+ */
+export const ZONE_NEIGHBOURHOODS: Record<string, number> = {
+  "Annex": 56,
+  "Avondale": 71,
+  "Banbury-Don Mills": 35,
+  "Bay-Cloverhill": 100,
+  "Bayview Village": 73,
+  "Bedford Park-Nortown": 44,
+  "Birchcliffe-Cliffside": 29,
+  "Blake-Jones": 99,
+  "Bridle Path-Sunnybrook-York Mills": 100,
+  "Cabbagetown-South St.James Town": 100,
+  "Casa Loma": 2,
+  "Church-Wellesley": 100,
+  "Danforth": 39,
+  "Downtown Yonge East": 100,
+  "East End-Danforth": 50,
+  "East Willowdale": 96,
+  "Forest Hill North": 100,
+  "Forest Hill South": 99,
+  "Greenwood-Coxwell": 36,
+  "Harbourfront-CityPlace": 11,
+  "High Park North": 96,
+  "High Park-Swansea": 78,
+  "Humewood-Cedarvale": 58,
+  "Junction Area": 89,
+  "Lambton Baby Point": 4,
+  "Lawrence Park North": 100,
+  "Lawrence Park South": 100,
+  "Leaside-Bennington": 97,
+  "Moss Park": 100,
+  "Mount Pleasant East": 35,
+  "Newtonbrook East": 15,
+  "North Riverdale": 100,
+  "North St.James Town": 100,
+  "North Toronto": 87,
+  "Playter Estates-Danforth": 99,
+  "Regent Park": 100,
+  "Rosedale-Moore Park": 100,
+  "Runnymede-Bloor West Village": 43,
+  "South Eglinton-Davisville": 93,
+  "South Parkdale": 18,
+  "South Riverdale": 86,
+  "St Lawrence-East Bayfront-The Islands": 56,
+  "St.Andrew-Windfields": 98,
+  "The Beaches": 66,
+  "Thorncliffe Park": 37,
+  "University": 24,
+  "Yonge-Bay Corridor": 100,
+  "Yonge-Doris": 64,
+  "Yonge-Eglinton": 97,
+  "Yonge-St.Clair": 100,
+};

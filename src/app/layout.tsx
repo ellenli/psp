@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const SITE_NAME = "PlayScore Plus";
+const SITE_NAME = "Neighbourhood Search";
 const DESCRIPTION =
   "Explore Toronto neighbourhoods by playability, walk, transit, and biking scores, and the places you care about.";
 
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
         url: "/preview.png",
         width: 1280,
         height: 640,
-        alt: "PlayScore Plus — interactive map of Toronto neighbourhood playability scores",
+        alt: "Neighbourhood Search — interactive map of Toronto neighbourhood playability scores",
       },
     ],
   },

@@ -128,6 +128,8 @@ export interface MapFeatureDatum {
   /** display value already formatted */
   valueLabel: string;
   color: string;
+  /** Outline only, no fill (e.g. outside the school zones). */
+  hidden?: boolean;
 }
 
 interface ScoreMapProps {
@@ -160,7 +162,14 @@ interface ScoreMapProps {
   scored?: boolean;
   /** Which school-zone layers to overlay; null/undefined hides them all. */
   schoolZones?: SchoolZonesVisibility | null;
+  /** "simple" = muted light-gray base; "detailed" = full OpenStreetMap. */
+  baseMap?: BaseMap;
 }
+
+export type BaseMap = "simple" | "detailed";
+
+const ESRI_GRAY =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_";
 
 /**
  * Fetches REAL nearby places for the current viewport (at/above `minZoom`),
@@ -417,17 +426,36 @@ function FitBounds({
       // it's that feature.
       map.fitBounds(bounds, { padding: [16, 16] });
     } else {
-      // Fallback (no features loaded yet): frame the full Greater Toronto Area,
-      // a bbox spanning Oakville/Milton (SW) to Uxbridge/Clarington (NE).
-      map.fitBounds(
-        [
-          [43.35, -79.95],
-          [44.35, -78.65],
-        ],
-        { padding: [16, 16] },
-      );
+      // Fallback (no features loaded yet): the widest allowed view.
+      map.fitBounds(MAX_VIEW, { padding: [16, 16] });
     }
   }, [bounds, map]);
+  return null;
+}
+
+/** Widest view allowed: Oakville (W) to Pickering (E), the lake to Richmond Hill. */
+const MAX_VIEW: [[number, number], [number, number]] = [
+  [43.42, -79.72],
+  [43.98, -78.98],
+];
+
+/**
+ * Keeps the map on Toronto: no panning past MAX_VIEW, and no zooming out
+ * beyond the zoom at which MAX_VIEW just fits (recomputed on resize).
+ */
+function MapLimits() {
+  const map = useMap();
+  React.useEffect(() => {
+    const apply = () => {
+      map.setMinZoom(map.getBoundsZoom(MAX_VIEW, false));
+    };
+    map.setMaxBounds(MAX_VIEW);
+    apply();
+    map.on("resize", apply);
+    return () => {
+      map.off("resize", apply);
+    };
+  }, [map]);
   return null;
 }
 
@@ -481,6 +509,7 @@ export default function ScoreMap({
   highlightContext = null,
   scored = true,
   schoolZones = null,
+  baseMap = "simple",
 }: ScoreMapProps) {
   const onZoneClick = React.useCallback(
     (ll: L.LatLng) => {
@@ -507,7 +536,7 @@ export default function ScoreMap({
   const dataKey = React.useMemo(
     () =>
       `${scored ? "s" : "u"}${zonesOn ? "z" : ""}:` +
-      data.map((d) => d.color).join("|"),
+      data.map((d) => (d.hidden ? "-" : d.color)).join("|"),
     [data, scored, zonesOn],
   );
 
@@ -516,7 +545,7 @@ export default function ScoreMap({
     const datum = data[idx];
     return {
       fillColor: datum?.color ?? naColor,
-      fillOpacity: scored ? (zonesOn ? 0.35 : 0.7) : 0,
+      fillOpacity: !scored || datum?.hidden ? 0 : zonesOn ? 0.35 : 0.7,
       color: "#555",
       weight: 1,
     };
@@ -539,16 +568,38 @@ export default function ScoreMap({
   return (
     <div className="relative h-full w-full">
       <MapContainer
-        center={[43.85, -79.3]}
-        zoom={9}
+        center={[43.7, -79.38]}
+        zoom={10}
+        zoomSnap={0.25}
+        maxBoundsViscosity={1}
         scrollWheelZoom
         className="h-full w-full rounded-md"
         style={{ background: "#e5e7eb" }}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        {baseMap === "detailed" ? (
+          <TileLayer
+            key="detailed"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+        ) : (
+          <>
+            <TileLayer
+              key="simple"
+              attribution="Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors"
+              url={`${ESRI_GRAY}Base/MapServer/tile/{z}/{y}/{x}`}
+              maxNativeZoom={16}
+            />
+            {/* Street/place labels drawn above the choropleth so they stay legible. */}
+            <TileLayer
+              key="simple-labels"
+              url={`${ESRI_GRAY}Reference/MapServer/tile/{z}/{y}/{x}`}
+              maxNativeZoom={16}
+              pane="shadowPane"
+            />
+          </>
+        )}
+        <MapLimits />
         <GeoJSON
           key={dataKey}
           data={collection}
