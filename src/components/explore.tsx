@@ -28,6 +28,7 @@ import { MetricTree } from "@/components/metric-tree";
 import { PlacesTwoSections } from "@/components/places/PlacesTwoSections";
 import { AreaDetailPanel } from "@/components/detail-sheet";
 import type { MapFeatureDatum } from "@/components/score-map";
+import type { SchoolZonesVisibility } from "@/components/school-zones-layer";
 
 import {
   CENSUS_CHARACTERISTICS,
@@ -189,6 +190,13 @@ export function Explore() {
   const [census, setCensus] =
     React.useState<CensusCharacteristicKey>("population");
   const [showCensus, setShowCensus] = React.useState(false);
+  // TDSB catchments for the top school neighbourhoods (overlay on the score map).
+  const [showZones, setShowZones] = React.useState(true);
+  const [zoneLayers, setZoneLayers] = React.useState<SchoolZonesVisibility>({
+    hs: true,
+    elem: true,
+    pins: true,
+  });
 
   // Geocode commute targets that have a cutoff, storing resolved coords by row
   // id. Network failures are swallowed (geocode returns null); unresolved rows
@@ -505,6 +513,60 @@ export function Explore() {
               </Select>
             )}
           </div>
+
+          {/* Control 5 */}
+          <div className="space-y-2">
+            <div className="flex items-start gap-2">
+              <Checkbox
+                id="show-zones"
+                checked={showZones}
+                onCheckedChange={(v) => setShowZones(v === true)}
+                className="mt-0.5"
+              />
+              <Label htmlFor="show-zones" className="text-xs leading-tight">
+                Show top school zones
+              </Label>
+            </div>
+            {showZones && (
+              <div className="space-y-2 pl-6">
+                {(
+                  [
+                    ["hs", "High-school catchments", "border-2 border-dashed"],
+                    ["elem", "Elementary catchments", "border-2 bg-foreground/20"],
+                    ["pins", "School pins (H, E, ★ private)", ""],
+                  ] as const
+                ).map(([key, label, swatch]) => (
+                  <div key={key} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`zones-${key}`}
+                      checked={zoneLayers[key]}
+                      onCheckedChange={(v) =>
+                        setZoneLayers((s) => ({ ...s, [key]: v === true }))
+                      }
+                    />
+                    <Label
+                      htmlFor={`zones-${key}`}
+                      className="flex items-center gap-1.5 text-xs font-normal leading-tight"
+                    >
+                      {swatch && (
+                        <span
+                          className={`inline-block h-3 w-3 rounded-sm border-foreground/60 ${swatch}`}
+                        />
+                      )}
+                      {label}
+                    </Label>
+                  </div>
+                ))}
+                <p className="text-[11px] leading-relaxed text-muted-foreground">
+                  Nine ranked neighbourhoods drawn with TDSB attendance
+                  boundaries; dotted outlines are shared zones with a choice of
+                  high school. Hover a zone for its drive to MDA and 2021
+                  Census demographics. TDSB lines are approximate, so confirm
+                  an address with TDSB&apos;s Find Your School tool.
+                </p>
+              </div>
+            )}
+          </div>
             </CardContent>
           </Card>
       </aside>
@@ -532,6 +594,7 @@ export function Explore() {
             highlight={hoverPlace}
             highlightContext={detailBounds}
             scored={scored}
+            schoolZones={showZones ? zoneLayers : null}
           />
         </div>
         {showCensus && (

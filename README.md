@@ -70,6 +70,16 @@ traffic).
 - **Detail-panel nearby** (`/api/places`): real places, open by default, with
   ratings and Maps links.
 
+- **Top school zones** (left-panel toggle, on by default): nine ranked
+  neighbourhoods drawn with **real TDSB attendance boundaries** (dashed =
+  high-school catchment, solid = elementary, dotted = shared/choice zone), with
+  pins for public high (H), public elementary (E) and private (★) schools.
+  Hovering a zone shows the neighbourhood, the drive to MDA, and 2021 Census
+  income / age / visible-minority figures. Zone data lives in
+  `src/lib/schoolZones.ts`; polygons in `public/data/school-catchments.json`
+  (downloaded from the TDSB School Search Map, 2026-09-30; TDSB calls its lines
+  approximate).
+
 **Seeded placeholders (clean interfaces, ready to swap):**
 - Per-metric sub-scores and census values fall back to deterministic seeds in
   `src/lib/mockScores.ts` when the ETL hasn't been run (see Data pipeline);

@@ -88,3 +88,96 @@ body {
 .leaflet-bottom {
   z-index: 0;
 }
+
+/* School zones overlay (src/components/school-zones-layer.tsx) */
+.leaflet-tooltip.sz-tip {
+  width: 290px;
+  white-space: normal;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--foreground);
+}
+.leaflet-tooltip.sz-tip-pin {
+  width: auto;
+  max-width: 240px;
+  padding: 6px 9px;
+}
+.sz-tip-h {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.sz-tip-what {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+.sz-tip dl { margin: 0; }
+.sz-tip dt {
+  margin-top: 6px;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
+.sz-tip dd { margin: 1px 0 0; }
+.sz-tip-src {
+  margin-top: 8px;
+  font-size: 10.5px;
+  color: var(--muted-foreground);
+}
+.sz-rank {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.sz-pin {
+  background: none;
+  border: 0;
+  filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.3));
+}
+.sz-label {
+  background: none;
+  border: 0;
+  pointer-events: none;
+}
+.sz-label div {
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--c);
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+}
+.sz-label .k {
+  display: block;
+  font-size: 8.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  opacity: 0.85;
+}
+.sz-label-hs div { font-size: 11.5px; }
+.sz-label-elem div { font-size: 10.5px; }
+.leaflet-container:not(.sz-zoomed) .sz-label-elem,
+.leaflet-container:not(.sz-zoomed) .sz-label .k {
+  display: none;
+}
+.leaflet-container:not(.sz-zoomed) .sz-label-hs div {
+  transform: translate(-50%, 60%);
+}

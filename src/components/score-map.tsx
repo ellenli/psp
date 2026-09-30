@@ -16,6 +16,34 @@ import type { Layer, LeafletMouseEvent, PathOptions } from "leaflet";
 import type { NeighbourhoodFeature } from "@/lib/types";
 import { decileLabel } from "@/lib/score";
 import { emojiForTag } from "@/lib/emoji";
+import {
+  SchoolZonesLayer,
+  type SchoolZonesVisibility,
+} from "@/components/school-zones-layer";
+
+/** Index of the feature whose polygon contains [lat, lng], or -1. */
+function featureAt(features: NeighbourhoodFeature[], lat: number, lng: number) {
+  const inRing = (ring: number[][]) => {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i];
+      const [xj, yj] = ring[j];
+      if (yi > lat !== yj > lat && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  };
+  return features.findIndex((f) => {
+    const polys =
+      f.geometry.type === "Polygon"
+        ? [f.geometry.coordinates as number[][][]]
+        : (f.geometry.coordinates as number[][][][]);
+    return polys.some(
+      ([outer, ...holes]) => inRing(outer) && !holes.some(inRing),
+    );
+  });
+}
 
 // ---------------------------------------------------------------------------
 // REAL places only. Markers come from the server-side /api/places route:
@@ -130,6 +158,8 @@ interface ScoreMapProps {
    * and show a centered hint overlay. Defaults to true.
    */
   scored?: boolean;
+  /** Which school-zone layers to overlay; null/undefined hides them all. */
+  schoolZones?: SchoolZonesVisibility | null;
 }
 
 /**
@@ -450,7 +480,15 @@ export default function ScoreMap({
   highlight = null,
   highlightContext = null,
   scored = true,
+  schoolZones = null,
 }: ScoreMapProps) {
+  const onZoneClick = React.useCallback(
+    (ll: L.LatLng) => {
+      const idx = featureAt(features, ll.lat, ll.lng);
+      if (idx >= 0) onFeatureClick(idx);
+    },
+    [features, onFeatureClick],
+  );
   // Index features so styling/click can look up their datum.
   const collection = React.useMemo<GeoJsonObject>(() => {
     return {
@@ -462,10 +500,15 @@ export default function ScoreMap({
     } as GeoJsonObject;
   }, [features]);
 
+  // School zones read poorly over a full-strength choropleth; fade it under them.
+  const zonesOn = !!schoolZones && (schoolZones.hs || schoolZones.elem);
+
   // Force GeoJSON re-render when styling data changes (Leaflet caches layers).
   const dataKey = React.useMemo(
-    () => `${scored ? "s" : "u"}:` + data.map((d) => d.color).join("|"),
-    [data, scored],
+    () =>
+      `${scored ? "s" : "u"}${zonesOn ? "z" : ""}:` +
+      data.map((d) => d.color).join("|"),
+    [data, scored, zonesOn],
   );
 
   function style(feature?: { properties?: { __idx?: number } }): PathOptions {
@@ -473,7 +516,7 @@ export default function ScoreMap({
     const datum = data[idx];
     return {
       fillColor: datum?.color ?? naColor,
-      fillOpacity: scored ? 0.7 : 0,
+      fillOpacity: scored ? (zonesOn ? 0.35 : 0.7) : 0,
       color: "#555",
       weight: 1,
     };
@@ -513,6 +556,9 @@ export default function ScoreMap({
           onEachFeature={onEachFeature}
         />
         <FitBounds bounds={bounds} />
+        {(zonesOn || schoolZones?.pins) && schoolZones && (
+          <SchoolZonesLayer show={schoolZones} onZoneClick={onZoneClick} />
+        )}
         {nearbyTags && nearbyTags.filter((t) => t.trim()).length > 0 && (
           <LiveNearbyLayer
             tags={nearbyTags}
